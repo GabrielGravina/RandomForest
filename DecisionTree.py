@@ -2,14 +2,14 @@ import numpy as np
 from collections import Counter
 
 class Node:
-    def __init__(self, feature=Nonte, threshold=None, left=None, right=None,*,value=None):
+    def __init__(self, feature=None, threshold=None, left=None, right=None,*,value=None):
         self.feature = feature
         self.threshold = threshold
         self.left = left
         self.right = right
-        self.value=None
+        self.value = value
 
-    def is_lead_none(self):
+    def is_leaf_node(self):
         return self.value is not None
 
 class DecisionTree:
@@ -37,7 +37,7 @@ class DecisionTree:
         best_feature, best_thresh = self._best_split(X, y, feat_idxs)
 
         # criar child nodes
-        left_idxs, right_idxs = selt._split(X[:,best_feature], best_thresh)
+        left_idxs, right_idxs = self._split(X[:,best_feature], best_thresh)
         left = self._grow_tree(X[left_idxs, :], y[left_idxs], depth+1)
         right = self._grow_tree(X[right_idxs, :], y[right_idxs], depth+1)
 
@@ -81,19 +81,16 @@ class DecisionTree:
 
         # calcular ganho de info
         information_gain = parent_entropy - child_entropy
-        
         return information_gain
-
 
     def _split(self, X_column, split_thresh):
         left_idxs = np.argwhere(X_column <= split_thresh).flatten()
         right_idxs = np.argwhere(X_column > split_thresh).flatten()
-
         return left_idxs, right_idxs
 
     def _entropy(self, y):
         hist = np.bincount(y)
-        ps = hist/len(y)
+        ps = hist / len(y)
         return -np.sum([p * np.log(p) for p in ps if p>0])
 
 
@@ -113,5 +110,3 @@ class DecisionTree:
             return self._traverse_tree(x, node.left)
         return self._traverse_tree(x, node.right)
         
-
-
