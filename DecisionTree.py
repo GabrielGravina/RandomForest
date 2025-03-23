@@ -23,6 +23,29 @@ class DecisionTree:
         self.n_features = X.shape[1] if not self.n_features else min(X.shape[1], self.n_features)
         self.root = self._grow_tree(X,y)
 
+    def visualize(self):
+        # Visualiza a árvore de decisão em formato de texto
+        if not self.root:
+            print("Árvore não treinada")
+            return
+        
+        def _print_node(node, depth=0):
+            if node.is_leaf_node():
+                print("  " * depth + f"-> Classe predita: {node.value}")
+                return
+        
+            print("  " * depth + f"Feature {node.feature} <= {node.threshold:.2f}")
+            _print_node(node.left, depth + 1)
+            print("  " * depth + f"Feature {node.feature} > {node.threshold:.2f}")
+            _print_node(node.right, depth + 1)
+        
+        _print_node(self.root)
+        
+    def export_graphviz(self, feature_names=None, class_names=None):
+        # Exporta a árvore para visualização gráfica
+        from visualize_tree import export_tree_to_graphviz  # Importa a função acima
+        return export_tree_to_graphviz(self, feature_names, class_names)
+
     def _grow_tree(self, X, y, depth=0):
         n_samples, n_feats = X.shape
         n_labels = len(np.unique(y))
